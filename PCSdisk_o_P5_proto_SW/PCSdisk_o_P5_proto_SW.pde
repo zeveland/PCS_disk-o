@@ -1,4 +1,9 @@
 
+import processing.serial.*;
+
+Serial myPort;  // Create object from Serial class
+
+
   
 int rings[] = {1, 6, 12, 20, 24, 28, 32, 40, 44, 48};
 float outerDiameter = 0;
@@ -32,8 +37,14 @@ void setup() {
     }
   }
   
-  frameRate(120);
+  String portName = Serial.list()[0];
+  println(portName);
+  myPort = new Serial(this, portName, 9600);
+  
+  frameRate(15);
 }
+
+long lastUpdate = 0;
 
 void draw() {
   background(0);
@@ -48,9 +59,20 @@ void draw() {
 //  line(circleOriginX, circleOriginY, sweepEndX, sweepEndY);
 //  sweepAngle += 0.5; 
   
-  for (int i=0; i<255; i++) {
-    dots[i].update();
+  boolean sendSerial = false;
+  if (millis() - lastUpdate > 1000) {
+    sendSerial = true;
+    lastUpdate = millis();
   }
+  
+  for (int i=0; i<255; i++) { 
+    dots[i].update();
+    if (sendSerial == true) {
+      dots[i].sendSerial();
+    }
+  }
+
+  
 
   /*
   if (true == goingOut) {
@@ -98,5 +120,22 @@ class Dot {
     text(n, x-5, y+5);
     b += 1 + random(-1, 1);
     b %= 510;
+  }
+  
+  void sendSerial() {
+    int _b = 0;
+    if (b>255) {
+//      fill(510-b);
+      _b = ((510-(int)b)<<16) + ((510-(int)b)<<8) + (510-(int)b);
+    } else {
+//      fill(b);
+      _b = (((int)b<<16) + ((int)b<<8) + (int)b);
+    }
+    
+    String s = '*' + hex(n, 2) + ':' + hex(_b, 6);
+//    myPort.write('*' + hex(n) + ':' + hex(_b));
+//    println(hex(n) + " " + hex(_b));
+//    println(s);
+    myPort.write(s);
   }
 }
