@@ -9,10 +9,11 @@ int ringCount = 10;
 int loopCount = 0;
 boolean goingOut = true;
 Dot dots[] = new Dot[255];
+float sweepAngle = 0;
 
 void setup() {
-//  size(2048, 1536);
-  size(1024, 768);
+  size(2048, 1536);
+//  size(1024, 768);
   outerDiameter = height * 0.9;
   outerRadius = outerDiameter / 2;
   circleOriginX = width/2;
@@ -39,10 +40,19 @@ void draw() {
   stroke(255);
   fill(0);
   
+  stroke(0, 255, 0);
+  strokeWeight(5);
+  
+//  float sweepEndX = circleOriginX - (outerRadius * cos(radians(sweepAngle)));
+//  float sweepEndY = circleOriginY - (outerRadius * sin(radians(sweepAngle)));
+//  line(circleOriginX, circleOriginY, sweepEndX, sweepEndY);
+//  sweepAngle += 0.5; 
+  
   for (int i=0; i<255; i++) {
     dots[i].update();
   }
 
+  /*
   if (true == goingOut) {
     loopCount++;
     if (loopCount >= 180) {
@@ -54,6 +64,7 @@ void draw() {
       goingOut = true;
     }
   }  
+  */
 }
 
 class Dot {
@@ -72,17 +83,20 @@ class Dot {
   }
   
   void update() {
+    strokeWeight(1);
     if (b>255) {
       fill(510-b);
     } else {
       fill(b);
     }
+    stroke(0);
     ellipse(x, y, d, d);
     textSize(10);
+
     stroke(255);
-    fill(255);
+    fill(255, 0, 0);
     text(n, x-5, y+5);
-    b += 1.5 + random(0.5);
+    b += 1 + random(-1, 1);
     b %= 510;
   }
 }
